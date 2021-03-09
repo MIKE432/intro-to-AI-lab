@@ -2,7 +2,7 @@ from numpy import mean
 
 from Config import Config
 from Consts import BEST_INIT_ITERATION
-from Individual import Individual
+from Solution import Solution
 
 
 class Population:
@@ -12,7 +12,7 @@ class Population:
         self.population = []
 
     def get_init_population(self, x):
-        self.population = [Individual.from_best_random(self.config, BEST_INIT_ITERATION) for _ in range(0, x)]
+        self.population = [Solution.from_best_random(self.config, BEST_INIT_ITERATION) for _ in range(0, x)]
 
     def get_mean(self):
         ints = list(map(lambda _x: _x.fitness, self.population))

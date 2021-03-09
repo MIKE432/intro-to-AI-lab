@@ -56,3 +56,7 @@ def get_current_position(prev_position, direction, length):
         return [prev_position[0], prev_position[1] - length]
     elif direction == LEFT:
         return [prev_position[0] - length, prev_position[1]]
+
+
+def is_in_board(point, width, height):
+    return 0 <= point[0] <= width and 0 <= point[1] <= height

@@ -1,7 +1,7 @@
 from Config import Config
 from Population import Population
 
-FILE = "test_file2"
+FILE = "test_file1"
 
 
 class Problem:

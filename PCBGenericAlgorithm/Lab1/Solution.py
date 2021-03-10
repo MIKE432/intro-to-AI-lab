@@ -1,8 +1,10 @@
 from random import randint
 
 from Config import Config
-from Consts import CLOSER_PROBABILITY, BOTTOM, LEFT, TOP, RIGHT, SUM_OUT_OF_BOARD_PENALTY, OUT_OF_BOARD_PENALTY
+from Consts import CLOSER_PROBABILITY, BOTTOM, LEFT, TOP, RIGHT, SUM_OUT_OF_BOARD_PENALTY, OUT_OF_BOARD_PENALTY, \
+    INTERSECTIONS_PENALTY
 from Tools import get_current_position, is_in_board
+from shapely.geometry import LineString
 
 
 class Solution:
@@ -12,7 +14,7 @@ class Solution:
         self.__fitness = None
         self.configuration = configuration
 
-    def randomize(self, ):
+    def randomize(self):
         for start, end in self.configuration.pairs:
             current_position = [start[0], start[1]]
             prev_dir = -1
@@ -52,10 +54,11 @@ class Solution:
 
     def __get_fitness_by_lazy(self):
         if self.__fitness is None:
-            self.__fitness = self.__calculate_fitness()
+            self.__fitness = self.__calculate_fitness
 
         return self.__fitness
 
+    @property
     def __calculate_fitness(self):
         all_segments = []
 
@@ -64,11 +67,30 @@ class Solution:
 
         length_sum = sum(map(lambda _x: _x[1], all_segments))
         out_of_board_sum, out_of_board = self.__get_out_of_board_length()
-
+        intersections = self.__get_intersection_number()
         return \
             length_sum + len(all_segments) \
             + (out_of_board_sum * SUM_OUT_OF_BOARD_PENALTY) \
-            + (out_of_board * OUT_OF_BOARD_PENALTY)
+            + (out_of_board * OUT_OF_BOARD_PENALTY) \
+            + (intersections * INTERSECTIONS_PENALTY)
+
+    def __get_intersection_number(self):
+        intersections = 0
+        points = self.configuration.pairs
+
+        for i in range(0, len(points)):
+            for j in range(0, len(self.segments[i])):
+                start, end = get_n_segment(points[i], self.segments[i], 0)
+                for k in range(i, len(points)):
+                    for l in range(j + 2 if i == k else j, len(self.segments[k])):
+                        start1, end1 = get_n_segment(points[k], self.segments[k], l)
+                        if are_segments_intersecting((start, end), (start1, end1)):
+                            intersections += 1
+
+        return intersections
+
+    def get_next(self, start, direction, length):
+        return start, get_current_position(start, direction, length)
 
     def __get_out_of_board_length(self):
         points = self.configuration.pairs
@@ -197,9 +219,21 @@ def is_segment_vertical(segment):
     return p1[0] == p2[0]
 
 
-# def are_segment_intersecting(seg1, seg2):
-#     if is_segment_vertical(seg1):
-#         if is_segment_vertical(seg2):
-#             return seg1[0][0] == seg2[0][0]
-#         else:
+def are_segments_intersecting(seg1, seg2):
+    l1 = LineString(seg1)
+    l2 = LineString(seg2)
 
+    return l1.intersects(l2)
+
+
+def get_n_segment(start, segments, n):
+    curr = start[0]
+    i = 0
+    for direction, l in segments:
+        end = get_current_position(curr, direction, l)
+        if i == n:
+            return curr, end
+        curr = end
+        i += 1
+
+    raise IndexError()

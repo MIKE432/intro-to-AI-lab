@@ -9,6 +9,7 @@ SECOND_SPLITTER = ","
 # --------------------- PENALTIES ----------------------
 SUM_OUT_OF_BOARD_PENALTY = 1.5
 OUT_OF_BOARD_PENALTY = 2.5
+INTERSECTIONS_PENALTY = 30.5
 # --------------------------------------------------------
 
 

@@ -1,7 +1,10 @@
+import time
+
 from Config import Config
 from Population import Population
+from UI import progressBar
 
-FILE = "test_file1"
+FILE = "test_file4"
 
 
 class Problem:

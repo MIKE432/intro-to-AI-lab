@@ -1,4 +1,6 @@
+import json
 from random import randint
+import numpy as np
 
 from Config import Config
 from Consts import CLOSER_PROBABILITY, BOTTOM, LEFT, TOP, RIGHT, SUM_OUT_OF_BOARD_PENALTY, OUT_OF_BOARD_PENALTY, \
@@ -10,7 +12,7 @@ from shapely.geometry import LineString
 class Solution:
 
     def __init__(self, configuration: Config):
-        self.segments = []
+        self.paths = []
         self.__fitness = None
         self.configuration = configuration
 
@@ -27,7 +29,10 @@ class Solution:
 
                 prev_dir = res[0]
 
-            self.segments.append(current_path)
+            self.paths.append(current_path)
+
+    def get_fitness(self):
+        return self.__calculate_fitness
 
     @classmethod
     def from_random(cls, configuration: Config):
@@ -62,10 +67,12 @@ class Solution:
     def __calculate_fitness(self):
         all_segments = []
 
-        for segment in self.segments:
+        for segment in self.paths:
             all_segments.extend(segment)
 
         length_sum = sum(map(lambda _x: _x[1], all_segments))
+        if len(all_segments) == 4:
+            x = 10
         out_of_board_sum, out_of_board = self.__get_out_of_board_length()
         intersections = self.__get_intersection_number()
         return \
@@ -78,19 +85,23 @@ class Solution:
         intersections = 0
         points = self.configuration.pairs
 
-        for i in range(0, len(points)):
-            for j in range(0, len(self.segments[i])):
-                start, end = get_n_segment(points[i], self.segments[i], 0)
-                for k in range(i, len(points)):
-                    for l in range(j + 2 if i == k else j, len(self.segments[k])):
-                        start1, end1 = get_n_segment(points[k], self.segments[k], l)
-                        if are_segments_intersecting((start, end), (start1, end1)):
+        segments = []
+
+        for i in range(0, len(self.paths)):
+            start = points[i]
+            curr = []
+            for j in range(0, len(self.paths[i])):
+                curr.append(get_n_segment(start, self.paths[i], j))
+            segments.append(curr)
+
+        for i in range(0, len(segments)):
+            for j in range(0, len(segments[i])):
+                for k in range(0, len(segments)):
+                    for l in range(j + 2 if i == k else 0, len(segments[k])):
+                        if are_segments_intersecting(segments[i][j], segments[k][l]):
                             intersections += 1
 
         return intersections
-
-    def get_next(self, start, direction, length):
-        return start, get_current_position(start, direction, length)
 
     def __get_out_of_board_length(self):
         points = self.configuration.pairs
@@ -98,7 +109,7 @@ class Solution:
         number = 0
         for i in range(0, len(points)):
             curr = points[i][0]
-            for direction, l in self.segments[i]:
+            for direction, l in self.paths[i]:
                 end = get_current_position(curr, direction, l)
                 end_in_board = is_in_board(end, self.configuration.width, self.configuration.height)
                 start_in_board = is_in_board(curr, self.configuration.width, self.configuration.height)
@@ -117,6 +128,23 @@ class Solution:
 
         return length, number
 
+    # def to_matrix(self):
+    #     width = self.configuration.width * 10
+    #     height = self.configuration.height * 10
+    #     matrix = np.zeros(width, height)
+    #     start_point = int(width/2) + self.configuration.width, int(height/2) + self.configuration.height
+    #     for i in range(0, len(self.paths)):
+    #         start = self.configuration.pairs[i][0]
+    #         curr = start[0] + start_point[0], start[1] + start_point[0]
+    #         for direction, l in self.paths[i]:
+    #
+    #             if direction == TOP:
+    #
+    #
+    #             curr = get_current_position(curr, direction, l)
+    #
+    #     return matrix
+
     def __gt__(self, other):
         return self.fitness > other.fitness
 
@@ -134,6 +162,9 @@ class Solution:
 
     def __ne__(self, other):
         return not other == self
+
+    def __str__(self):
+        pass
 
 
 def get_random_vector(curr, end, prev_dir, max_width, max_height):

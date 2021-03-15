@@ -125,7 +125,7 @@ class Solution:
                     length = get_length_to_edge(end, direction, self.configuration.width,
                                                 self.configuration.height)
                     number += 1
-
+                curr = end
         return length, number
 
     # def to_matrix(self):

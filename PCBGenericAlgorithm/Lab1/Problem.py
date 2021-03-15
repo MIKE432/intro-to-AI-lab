@@ -1,10 +1,8 @@
 import time
 
 from Config import Config
+from Consts import FILE, POPULATION_NUMBER
 from Population import Population
-from UI import progressBar
-
-FILE = "test_file4"
 
 
 class Problem:
@@ -15,7 +13,7 @@ class Problem:
         self.population = Population(config)
 
     def run_problem(self):
-        self.population.get_init_population(1000)
+        self.population.get_init_population(POPULATION_NUMBER)
         print(self.population.get_mean())
         if self.population.population[0] > self.population.population[1]:
             x = 10

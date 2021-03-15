@@ -31,3 +31,7 @@ CLOSER_PROBABILITY = 2
 # ---------------------- INIT CONFIG ---------------------
 BEST_INIT_ITERATION = 10
 # --------------------------------------------------------
+
+
+FILE = "test_file1"
+POPULATION_NUMBER = 1000

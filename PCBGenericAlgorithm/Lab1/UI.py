@@ -1,3 +1,6 @@
+from subprocess import call
+
+
 def progressBar(iterable, prefix='', suffix='', decimals=1, length=100, fill='â–ˆ', printEnd="\r"):
     """
     Call in a loop to create terminal progress bar
@@ -28,3 +31,8 @@ def progressBar(iterable, prefix='', suffix='', decimals=1, length=100, fill='â–
         printProgressBar(i + 1)
     # Print New Line on Complete
     print()
+
+
+# using Mateusz Groblicki script to print the board
+def to_png(json, name):
+    call(["python3", "D:\\Studia\\Semestr 6\\Sztuczna intelingencja\\libraries\\SI_GA_BoardGenerator\\generator.py", json, name])

@@ -1,8 +1,28 @@
+import json
+from random import randint
+
+import numpy as np
+
 from Config import Config
-from Consts import SUM_OUT_OF_BOARD_PENALTY, OUT_OF_BOARD_PENALTY, INTERSECTIONS_PENALTY
+from Consts import SUM_OUT_OF_BOARD_PENALTY, OUT_OF_BOARD_PENALTY, INTERSECTIONS_PENALTY, JSON_FILE, CROSS_PROBABILITY, \
+    INHERIT_PARENT, PATH_MUTATION_PROBABILITY
 from Path import Path
 from SolutionTools import get_length_to_edge, are_segments_intersecting, get_n_segment
 from Tools import get_current_position, is_in_board
+import UI
+from printer.generator import store_png
+
+
+class SolutionJSON:
+    def __init__(self, paths, points, width, height, fitness, generation=1):
+        self.board = [width, height]
+        self.paths = paths
+        self.points = points
+        self.fitness = fitness
+        self.generation = generation
+
+    def to_json(self):
+        return json.dumps(self, default=lambda o: o.__dict__)
 
 
 class Solution:
@@ -120,7 +140,6 @@ class Solution:
 
         return length, number
 
-
     # def to_matrix(self):
     #     width = self.configuration.width * 10
     #     height = self.configuration.height * 10
@@ -137,6 +156,38 @@ class Solution:
     #             curr = get_current_position(curr, direction, l)
     #
     #     return matrix
+
+    def to_json(self):
+        width = self.configuration.width
+        height = self.configuration.height
+        generation = 1
+        paths = []
+        points = []
+
+        for path in self.paths:
+            paths.append(path.get_points())
+
+        for _points in self.configuration.pairs:
+            points.append(_points[0])
+            points.append(_points[1])
+        json = SolutionJSON(paths, points, width, height, self.fitness, generation)
+        return json.to_json()
+
+    def to_json_file(self):
+        _json = self.to_json()
+        f = open(JSON_FILE, "w")
+        f.write(_json)
+        f.close()
+
+    def to_png(self):
+        self.to_json_file()
+        store_png()
+
+    def mutate(self):
+        for path in self.paths:
+            random = np.random.random(1)[0]
+            if random <= PATH_MUTATION_PROBABILITY:
+                path.mutate()
 
     def __gt__(self, other):
         return self.fitness > other.fitness
@@ -160,5 +211,18 @@ class Solution:
         pass
 
 
-def cross(parent1: Solution, parent2: Solution):
-    pass
+def cross(parent1: Solution, parent2: Solution, configuration: Config):
+    paths = []
+    random = np.random.random(1)[0]
+
+    if random <= CROSS_PROBABILITY:
+        point = randint(0, len(parent1.paths))
+        paths.extend(parent1.paths[:point])
+        paths.extend(parent2.paths[point:])
+    else:
+        if random > .5:
+            paths.extend(parent1.paths)
+        else:
+            paths.extend(parent2.paths)
+
+    return Solution(configuration, paths)

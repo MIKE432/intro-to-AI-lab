@@ -1,8 +1,9 @@
 import time
 
 from Config import Config
-from Consts import FILE, POPULATION_NUMBER
+from Consts import FILE, POPULATION_NUMBER, EPOCHS_WITHOUT_BEST
 from Population import Population
+from Solution import cross
 
 
 class Problem:
@@ -10,27 +11,32 @@ class Problem:
     def __init__(self):
         config = Config.initialize(FILE)
         self.config = config
-        self.population = Population(config)
 
     def run_problem(self):
-        # POPULATION_NUMBER
-        self.population.get_init_population(POPULATION_NUMBER)
-        x = self.population.roulette()
-        self.population.test()
-        print(self.population.get_mean())
-        if self.population.population[0] > self.population.population[1]:
-            x = 10
-        if self.population.population[0] < self.population.population[1]:
-            x = 10
-        if self.population.population[0] >= self.population.population[1]:
-            x = 10
-        if self.population.population[0] <= self.population.population[1]:
-            x = 10
+        prev_population = Population(self.config)
+        prev_population.get_init_population(POPULATION_NUMBER)
+        best = prev_population.get_best()
+        counter = 0
+        epoch = 0
 
-        if self.population.population[0] == self.population.population[1]:
-            x = 10
-        if self.population.population[0] != self.population.population[1]:
-            x = 10
+        print("\n")
+
+        while counter > EPOCHS_WITHOUT_BEST:
+            epoch += 1
+            next_pop = Population(self.config)
+            while len(next_pop) == POPULATION_NUMBER:
+                parent1 = prev_population.tournament()
+                parent2 = prev_population.roulette()
+
+                new_solution = cross(parent1, parent2, self.config)
+                new_solution.mutate()
+
+                if new_solution > best:
+                    best = new_solution
+                    counter = 0
+
+        best.to_png()
+
 
 
 if __name__ == "__main__":
@@ -40,7 +46,7 @@ if __name__ == "__main__":
     b = 1 / (7 * x)
     c = 1 / (5 * x)
     xx = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-
-    print(xx[0:1])
+    xx.insert(8 + 1, 10)
+    print(xx)
     problem = Problem()
     problem.run_problem()

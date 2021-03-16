@@ -16,7 +16,7 @@ class Population:
 
     def get_init_population(self, x):
         pb = ProgressBar(total=x, prefix='Population initialization', suffix='Completed', decimals=1, length=50,
-                         fill='X', zfill='-')
+                         fill='█', zfill='-')
         curr = []
         for progress in range(x):
             curr.append(Solution.from_best_random(self.config, BEST_INIT_ITERATION))
@@ -26,7 +26,8 @@ class Population:
     def get_mean(self):
         ints = list(map(lambda _x: _x.fitness, self.population))
         x = min(self.population, key=lambda _x: _x.fitness)
-        x.get_fitness()
+        x.mutate()
+        x.to_png()
         return x
 
     def tournament(self):
@@ -61,3 +62,12 @@ class Population:
                 return probabilities[i]
 
         return None
+
+    def add_solution(self, solution: Solution):
+        self.population.append(solution)
+
+    def __len__(self):
+        return len(self.population)
+
+    def get_best(self):
+        return min(self.population)

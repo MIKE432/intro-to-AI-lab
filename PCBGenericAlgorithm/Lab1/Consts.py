@@ -29,10 +29,18 @@ CLOSER_PROBABILITY = 2
 
 # --------------------------------------------------------
 # ---------------------- INIT CONFIG ---------------------
-BEST_INIT_ITERATION = 10
+BEST_INIT_ITERATION = 2
 # --------------------------------------------------------
 
 
-FILE = "test_file4"
-POPULATION_NUMBER = 1000
+FILE = "test_file2"
+POPULATION_NUMBER = 100
 TOURNAMENT_SIZE = 10
+CROSS_PROBABILITY = 0.05
+INHERIT_PARENT = 0  # left parent(0) right(1)
+MUTATE_MOVE = 1
+PATH_MUTATION_PROBABILITY = 0.05
+EPOCHS_WITHOUT_BEST = 5
+
+JSON_FILE = "assets/solution_to_print.json"
+OUTPUT = "assets/output.png"

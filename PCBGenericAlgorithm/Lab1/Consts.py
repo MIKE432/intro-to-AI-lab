@@ -33,5 +33,6 @@ BEST_INIT_ITERATION = 10
 # --------------------------------------------------------
 
 
-FILE = "test_file1"
+FILE = "test_file4"
 POPULATION_NUMBER = 1000
+TOURNAMENT_SIZE = 10

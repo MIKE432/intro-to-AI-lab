@@ -13,7 +13,10 @@ class Problem:
         self.population = Population(config)
 
     def run_problem(self):
+        # POPULATION_NUMBER
         self.population.get_init_population(POPULATION_NUMBER)
+        x = self.population.roulette()
+        self.population.test()
         print(self.population.get_mean())
         if self.population.population[0] > self.population.population[1]:
             x = 10
@@ -31,5 +34,13 @@ class Problem:
 
 
 if __name__ == "__main__":
+    x = 1 / 7 + 1 / 2 + 1 / 5
+
+    a = 1 / (2 * x)
+    b = 1 / (7 * x)
+    c = 1 / (5 * x)
+    xx = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+
+    print(xx[0:1])
     problem = Problem()
     problem.run_problem()

@@ -1,7 +1,9 @@
-from numpy import mean
+from random import randint
+
+import numpy as np
 
 from Config import Config
-from Consts import BEST_INIT_ITERATION
+from Consts import BEST_INIT_ITERATION, TOURNAMENT_SIZE, POPULATION_NUMBER
 from Solution import Solution
 from console_progressbar import ProgressBar
 
@@ -13,12 +15,12 @@ class Population:
         self.population = []
 
     def get_init_population(self, x):
-        pb = ProgressBar(total=1000, prefix='Population initialization', suffix='Completed', decimals=1, length=50,
+        pb = ProgressBar(total=x, prefix='Population initialization', suffix='Completed', decimals=1, length=50,
                          fill='X', zfill='-')
         curr = []
         for progress in range(x):
             curr.append(Solution.from_best_random(self.config, BEST_INIT_ITERATION))
-            pb.print_progress_bar(progress)
+            pb.print_progress_bar(progress + 1)
         self.population = curr
 
     def get_mean(self):
@@ -26,3 +28,36 @@ class Population:
         x = min(self.population, key=lambda _x: _x.fitness)
         x.get_fitness()
         return x
+
+    def tournament(self):
+        picked_parents = []
+
+        for i in range(0, TOURNAMENT_SIZE):
+            random = randint(0, len(self.population))
+            while random in picked_parents:
+                random = randint(0, len(self.population))
+
+            picked_parents.append(random)
+
+        potential_winners = list(map(lambda _x: self.population[_x], picked_parents))
+        return min(potential_winners)
+
+    def roulette(self):
+        weights = []
+        for solution in self.population:
+            weights.append(1 / solution.fitness)
+
+        weights_sum = np.sum(weights)
+
+        probabilities = list(map(lambda _x: _x / weights_sum, weights))
+        random = np.random.random(1)[0]
+
+        for i in range(0, len(probabilities) - 1):
+            previous = np.sum(probabilities[0:i + 1])
+            if i + 1 == len(probabilities):
+                return probabilities[i]
+
+            if previous <= random < previous + probabilities[i + 1]:
+                return probabilities[i]
+
+        return None

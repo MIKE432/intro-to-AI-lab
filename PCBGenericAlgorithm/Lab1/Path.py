@@ -1,5 +1,5 @@
 from Config import Config
-from Solution import get_random_vector, get_length_to_edge
+from SolutionTools import get_random_vector, get_length_to_edge
 from Tools import get_current_position, is_in_board
 
 
@@ -7,7 +7,10 @@ class Path:
     def __init__(self, start, end, config: Config, segments=None):
         self.start = start
         self.end = end
-        self.segments = segments
+        if segments is None:
+            self.segments = []
+        else:
+            self.segments = segments
         self.configuration = config
 
     def randomize(self):
@@ -48,3 +51,6 @@ class Path:
                                             self.configuration.height)
                 number += 1
             curr = end
+
+    def mutate(self):
+        pass

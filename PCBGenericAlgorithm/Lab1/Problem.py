@@ -1,5 +1,7 @@
 import time
 
+from console_progressbar import ProgressBar
+
 from Config import Config
 from Consts import FILE, POPULATION_NUMBER, EPOCHS_WITHOUT_BEST
 from Population import Population
@@ -21,32 +23,37 @@ class Problem:
 
         print("\n")
 
-        while counter > EPOCHS_WITHOUT_BEST:
+        while self.condition(counter):
             epoch += 1
             next_pop = Population(self.config)
-            while len(next_pop) == POPULATION_NUMBER:
+            pb = ProgressBar(total=POPULATION_NUMBER, prefix=f'Epoch: {epoch}', suffix='Completed', decimals=1,
+                             length=50,
+                             fill='█', zfill='-')
+            while len(next_pop) != POPULATION_NUMBER:
+                w = len(next_pop)
+                pb.print_progress_bar(w + 1)
                 parent1 = prev_population.tournament()
                 parent2 = prev_population.roulette()
 
                 new_solution = cross(parent1, parent2, self.config)
                 new_solution.mutate()
+                next_pop.add_solution(new_solution)
 
-                if new_solution > best:
-                    best = new_solution
-                    counter = 0
+            new_best = next_pop.get_best()
+            prev_population = next_pop
+            counter += 1
+            print("Best: " + str(new_best.fitness) + ", current best: " + str(
+                best.fitness) + ", " + "Algorithm ends in: " + str(EPOCHS_WITHOUT_BEST - counter))
+            if new_best < best:
+                best = new_best
+                counter = 0
 
         best.to_png()
 
+    def condition(self, counter):
+        return counter < EPOCHS_WITHOUT_BEST
 
 
 if __name__ == "__main__":
-    x = 1 / 7 + 1 / 2 + 1 / 5
-
-    a = 1 / (2 * x)
-    b = 1 / (7 * x)
-    c = 1 / (5 * x)
-    xx = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-    xx.insert(8 + 1, 10)
-    print(xx)
     problem = Problem()
     problem.run_problem()

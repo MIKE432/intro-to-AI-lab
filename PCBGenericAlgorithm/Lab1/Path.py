@@ -1,3 +1,4 @@
+from copy import deepcopy
 from random import randint
 
 import numpy as np
@@ -19,6 +20,7 @@ class Path:
         self.configuration = config
 
     def randomize(self):
+        self.segments = []
         current_position = [self.start[0], self.start[1]]
         prev_dir = -1
         while current_position != [self.end[0], self.end[1]]:
@@ -72,10 +74,13 @@ class Path:
     def __mutation_type_a(self):
         random_direction_prob = np.random.random(1)[0]
         random_segment_index = randint(0, len(self.segments) - 1)
-        curr_direction, curr_l = self.segments[random_segment_index]
-        direction = -1
-        prev_segment_to_insert = None
-        next_segment_to_insert = None
+        move = randint(1, MUTATE_MOVE)
+        new_segments = []
+        copied_segments = deepcopy(self.segments)
+        if random_segment_index > 0:
+            new_segments.extend(copied_segments[:random_segment_index - 1])
+
+        curr_direction, curr_l = copied_segments[random_segment_index]
 
         if curr_direction in [0, 2]:
             direction = 1 if random_direction_prob > 0.5 else 3
@@ -84,40 +89,41 @@ class Path:
 
         # prev
         if random_segment_index > 0:
-            prev_direction, prev_l = self.segments[random_segment_index - 1]
+            prev_direction, prev_l = copied_segments[random_segment_index - 1]
             if prev_direction == curr_direction:
-                prev_segment_to_insert = [direction, MUTATE_MOVE]
+                new_segments.append([prev_direction, prev_l])
+                new_segments.append([direction, move])
             else:
-                self.segments[random_segment_index - 1][1] += 1 if direction == prev_direction else -1
-                if self.segments[random_segment_index - 1][1] == 0:
-                    self.segments.remove(random_segment_index - 1)
+                copied_segments[random_segment_index - 1][1] += (1 if direction == prev_direction else -1) * move
+                if copied_segments[random_segment_index - 1][1] != 0:
+                    new_segments.append(copied_segments[random_segment_index - 1])
         else:
-            prev_segment_to_insert = [direction, MUTATE_MOVE]
+            new_segments.append([direction, move])
+
+        new_segments.append(copied_segments[random_segment_index])
 
         # next
-        if random_segment_index != len(self.segments) - 1:
-            next_direction, next_l = self.segments[random_segment_index + 1]
+        if random_segment_index != len(copied_segments) - 1:
+            next_direction, next_l = copied_segments[random_segment_index + 1]
             if next_direction == curr_direction:
-                next_segment_to_insert = [(direction + 2) % 4, MUTATE_MOVE]
+                new_segments.append([(direction + 2) % 4, move])
+                new_segments.append([next_direction, next_l])
             else:
-                self.segments[random_segment_index + 1][1] += 1 if direction != next_direction else -1
-                if self.segments[random_segment_index + 1][1] == 0:
-                    self.segments.remove(random_segment_index + 1)
+                copied_segments[random_segment_index + 1][1] += (1 if direction != next_direction else -1) * move
+                if copied_segments[random_segment_index + 1][1] != 0:
+                    new_segments.append(copied_segments[random_segment_index + 1])
         else:
-            next_segment_to_insert = [(direction + 2) % 4, MUTATE_MOVE]
+            new_segments.append([(direction + 2) % 4, move])
 
-        if next_segment_to_insert is not None:
-            self.segments.insert(random_segment_index + 1, next_segment_to_insert)
+        new_segments.extend(copied_segments[random_segment_index + 2:])
 
-        if prev_segment_to_insert is not None:
-            self.segments.insert(random_segment_index, prev_segment_to_insert)
-            # insert poprzedni na i a następny na i + 1
-
-        test = self.is_correct()
+        self.segments = new_segments
 
     def is_correct(self):
         curr = self.start
         for direction, l in self.segments:
             curr = get_current_position(curr, direction, l)
-        x = curr == self.end
+
+        x = curr[0] == self.end[0] and curr[1] == self.end[1]
+
         return x

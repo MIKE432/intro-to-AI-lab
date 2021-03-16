@@ -1,4 +1,5 @@
 import json
+from copy import deepcopy
 from random import randint
 
 import numpy as np
@@ -39,7 +40,6 @@ class Solution:
         for start, end in self.configuration.pairs:
             current_path = Path(start, end, self.configuration)
             current_path.randomize()
-
             self.paths.append(current_path)
 
     def get_fitness(self):
@@ -82,12 +82,10 @@ class Solution:
             all_segments.extend(segment)
 
         length_sum = sum(map(lambda _x: _x[1], all_segments))
-        if len(all_segments) == 4:
-            x = 10
         out_of_board_sum, out_of_board = self.__get_out_of_board_length()
         intersections = self.__get_intersection_number()
         return \
-            length_sum + len(all_segments) \
+            length_sum \
             + (out_of_board_sum * SUM_OUT_OF_BOARD_PENALTY) \
             + (out_of_board * OUT_OF_BOARD_PENALTY) \
             + (intersections * INTERSECTIONS_PENALTY)
@@ -217,12 +215,12 @@ def cross(parent1: Solution, parent2: Solution, configuration: Config):
 
     if random <= CROSS_PROBABILITY:
         point = randint(0, len(parent1.paths))
-        paths.extend(parent1.paths[:point])
-        paths.extend(parent2.paths[point:])
+        paths.extend(deepcopy(parent1.paths[:point]))
+        paths.extend(deepcopy(parent2.paths[point:]))
     else:
         if random > .5:
-            paths.extend(parent1.paths)
+            paths.extend(deepcopy(parent1.paths))
         else:
-            paths.extend(parent2.paths)
+            paths.extend(deepcopy(parent2.paths))
 
-    return Solution(configuration, paths)
+    return Solution(configuration, deepcopy(paths))

@@ -34,9 +34,9 @@ class Population:
         picked_parents = []
 
         for i in range(0, TOURNAMENT_SIZE):
-            random = randint(0, len(self.population))
+            random = randint(0, len(self.population) - 1)
             while random in picked_parents:
-                random = randint(0, len(self.population))
+                random = randint(0, len(self.population) - 1)
 
             picked_parents.append(random)
 
@@ -53,13 +53,13 @@ class Population:
         probabilities = list(map(lambda _x: _x / weights_sum, weights))
         random = np.random.random(1)[0]
 
-        for i in range(0, len(probabilities) - 1):
+        for i in range(0, len(probabilities)):
             previous = np.sum(probabilities[0:i + 1])
             if i + 1 == len(probabilities):
-                return probabilities[i]
+                return self.population[i]
 
             if previous <= random < previous + probabilities[i + 1]:
-                return probabilities[i]
+                return self.population[i]
 
         return None
 

@@ -6,7 +6,7 @@ import numpy as np
 from Config import Config
 from Consts import MUTATE_MOVE
 from SolutionTools import get_random_vector, get_length_to_edge
-from Tools import get_current_position, is_in_board
+from Tools import get_current_position, is_in_board, get_direction_vector
 
 
 class Path:
@@ -68,12 +68,36 @@ class Path:
 
         return points
 
-    def mutate(self):
-        self.__mutation_type_a()
+    def intersects_with(self, other):
+        p = []
+        p.extend(self.get_every_points())
+        p.extend(other.get_every_points())
 
-    def __mutation_type_a(self):
-        random_direction_prob = np.random.random(1)[0]
+        m = {}
+
+        for point in p:
+            m[point] = 0 if point not in m else m[point] + 1
+
+        return sum(m.values())
+
+    def mutate(self):
         random_segment_index = randint(0, len(self.segments) - 1)
+        self.__mutate_segment(random_segment_index)
+
+    def __mutate_segment(self, segment):
+        if randint(0, 100) > 75:
+            self.__split_segment(segment)
+        self.__mutation(segment)
+
+    def __split_segment(self, segment):
+        random = randint(1, self.segments[segment][1])
+        curr = self.segments[segment]
+
+        curr[1] -= random
+        self.segments.insert(segment, [curr[0], random])
+
+    def __mutation(self, random_segment_index):
+        random_direction_prob = np.random.random(1)[0]
         move = randint(1, MUTATE_MOVE)
         new_segments = []
         copied_segments = deepcopy(self.segments)
@@ -127,3 +151,16 @@ class Path:
         x = curr[0] == self.end[0] and curr[1] == self.end[1]
 
         return x
+
+    def get_every_points(self):
+        points = [self.start]
+        curr = self.start
+        for direction, l in self.segments:
+            for i in range(0, l):
+                vector = get_direction_vector(direction)
+                _next = np.sum([curr, vector], axis=0)
+                _next = _next[0], _next[1]
+                points.append(_next)
+                curr = _next
+
+        return points

@@ -1,4 +1,4 @@
-from Consts import FIRST_SPLITTER, SECOND_SPLITTER, TOP, RIGHT, BOTTOM, LEFT
+from Consts import FIRST_SPLITTER, SECOND_SPLITTER, TOP, RIGHT, BOTTOM, LEFT, INTERSECTIONS_PENALTY
 from Exceptions import NoPointsToConnectException, WrongEntryFileFormat
 
 
@@ -60,3 +60,27 @@ def get_current_position(prev_position, direction, length):
 
 def is_in_board(point, width, height):
     return 0 <= point[0] <= width and 0 <= point[1] <= height
+
+
+def get_direction_vector(direction):
+    if direction == 0:
+        return [0, 1]
+    elif direction == 1:
+        return [1, 0]
+    elif direction == 2:
+        return [0, -1]
+    else:
+        return [-1, 0]
+
+
+def get_init_intersections_pentalties(paths_num):
+    _x = {}
+
+    for i in range(0, paths_num):
+        _y = {}
+        for j in range(0, paths_num):
+            if i != j:
+                _y[j] = 1 * INTERSECTIONS_PENALTY
+        _x[i] = _y
+
+    return _x

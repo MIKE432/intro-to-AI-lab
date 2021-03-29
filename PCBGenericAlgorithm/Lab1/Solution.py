@@ -42,8 +42,8 @@ class Solution:
             current_path.randomize()
             self.paths.append(current_path)
 
-    def get_fitness(self):
-        return self.__calculate_fitness
+    def get_fitness(self, intersections):
+        return self.__calculate_fitness(intersections)
 
     @classmethod
     def from_random(cls, configuration: Config):
@@ -52,30 +52,38 @@ class Solution:
         return ind
 
     @classmethod
-    def from_best_random(cls, configuration: Config, iteration: int):
+    def from_best_random(cls, configuration: Config, iteration: int, intersections):
         best = Solution(configuration)
         best.randomize()
 
         for i in range(0, iteration - 1):
             candidate = Solution(configuration)
             candidate.randomize()
-            if candidate < best:
+            if candidate.fitness(intersections) < best.fitness(intersections):
                 best = candidate
 
         return best
 
-    @property
-    def fitness(self):
-        return self.__get_fitness_by_lazy()
+    def get_next_intersections(self, prev_intersections):
+        _x = {}
 
-    def __get_fitness_by_lazy(self):
+        for i in prev_intersections.keys():
+            for j in prev_intersections[i].keys():
+                if self.paths[i].intersects_with(self.paths[j]) > 0:
+                    prev_intersections[i][j] += INTERSECTIONS_PENALTY
+
+        return prev_intersections
+
+    def fitness(self, intersections):
+        return self.__get_fitness_by_lazy(intersections)
+
+    def __get_fitness_by_lazy(self, intersections):
         if self.__fitness is None:
-            self.__fitness = self.__calculate_fitness
+            self.__fitness = self.__calculate_fitness(intersections)
 
         return self.__fitness
 
-    @property
-    def __calculate_fitness(self):
+    def __calculate_fitness(self, intersections):
         all_segments = []
 
         for segment in self.paths:
@@ -83,34 +91,31 @@ class Solution:
 
         length_sum = sum(map(lambda _x: _x[1], all_segments))
         out_of_board_sum, out_of_board = self.__get_out_of_board_length()
-        intersections = self.__get_intersection_number()
+        intersections_penalty = self.__get_intersection_penalty(intersections)
+
         return \
             length_sum \
             + (out_of_board_sum * SUM_OUT_OF_BOARD_PENALTY) \
             + (out_of_board * OUT_OF_BOARD_PENALTY) \
-            + (intersections * INTERSECTIONS_PENALTY)
+            + intersections_penalty
 
-    def __get_intersection_number(self):
-        intersections = 0
-        points = self.configuration.pairs
-
-        segments = []
+    def __get_intersection_penalty(self, intersections):
+        penalty = 0
 
         for i in range(0, len(self.paths)):
-            start = points[i]
-            curr = []
-            for j in range(0, len(self.paths[i])):
-                curr.append(get_n_segment(start, self.paths[i], j))
-            segments.append(curr)
+            for j in range(0, len(self.paths)):
+                if i != j:
+                    if self.paths[i].intersects_with(self.paths[j]):
+                        penalty += intersections[i][j]
 
-        for i in range(0, len(segments)):
-            for j in range(0, len(segments[i])):
-                for k in range(0, len(segments)):
-                    for l in range(j + 2 if i == k else 0, len(segments[k])):
-                        if are_segments_intersecting(segments[i][j], segments[k][l]):
-                            intersections += 1
+        return penalty
 
-        return intersections
+    def get_all_points(self):
+        points = []
+        for path in self.paths:
+            points.extend(path.get_every_points())
+
+        return points
 
     def __get_out_of_board_length(self):
         points = self.configuration.pairs
@@ -138,24 +143,7 @@ class Solution:
 
         return length, number
 
-    # def to_matrix(self):
-    #     width = self.configuration.width * 10
-    #     height = self.configuration.height * 10
-    #     matrix = np.zeros(width, height)
-    #     start_point = int(width/2) + self.configuration.width, int(height/2) + self.configuration.height
-    #     for i in range(0, len(self.paths)):
-    #         start = self.configuration.pairs[i][0]
-    #         curr = start[0] + start_point[0], start[1] + start_point[0]
-    #         for direction, l in self.paths[i]:
-    #
-    #             if direction == TOP:
-    #
-    #
-    #             curr = get_current_position(curr, direction, l)
-    #
-    #     return matrix
-
-    def to_json(self):
+    def to_json(self, intersections):
         width = self.configuration.width
         height = self.configuration.height
         generation = 1
@@ -168,52 +156,31 @@ class Solution:
         for _points in self.configuration.pairs:
             points.append(_points[0])
             points.append(_points[1])
-        json = SolutionJSON(paths, points, width, height, self.fitness, generation)
+        json = SolutionJSON(paths, points, width, height, self.fitness(intersections), generation)
         return json.to_json()
 
-    def to_json_file(self):
-        _json = self.to_json()
+    def to_json_file(self, intersections):
+        _json = self.to_json(intersections)
         f = open(JSON_FILE, "w")
         f.write(_json)
         f.close()
 
-    def to_png(self):
-        self.to_json_file()
+    def to_png(self, intersections):
+        self.to_json_file(intersections)
         store_png()
 
-    def mutate(self):
+    def mutate(self, mutate_prob):
         for path in self.paths:
             random = np.random.random(1)[0]
-            if random <= PATH_MUTATION_PROBABILITY:
+            if random <= mutate_prob:
                 path.mutate()
 
-    def __gt__(self, other):
-        return self.fitness > other.fitness
 
-    def __lt__(self, other):
-        return self.fitness < other.fitness
-
-    def __ge__(self, other):
-        return self.fitness >= other.fitness
-
-    def __le__(self, other):
-        return not self >= other
-
-    def __eq__(self, other):
-        return other.fitness == self.fitness
-
-    def __ne__(self, other):
-        return not other == self
-
-    def __str__(self):
-        pass
-
-
-def cross(parent1: Solution, parent2: Solution, configuration: Config):
+def cross(parent1: Solution, parent2: Solution, configuration: Config, cross_prob):
     paths = []
     random = np.random.random(1)[0]
 
-    if random <= CROSS_PROBABILITY:
+    if random <= cross_prob:
         point = randint(0, len(parent1.paths))
         paths.extend(deepcopy(parent1.paths[:point]))
         paths.extend(deepcopy(parent2.paths[point:]))

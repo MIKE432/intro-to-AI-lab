@@ -19,7 +19,7 @@ class Population:
                          fill='█', zfill='-')
         curr = []
         for progress in range(x):
-            curr.append(Solution.from_best_random(self.config, BEST_INIT_ITERATION))
+            curr.append(Solution.from_random(self.config))
             pb.print_progress_bar(progress + 1)
         self.population = curr
 
@@ -30,10 +30,10 @@ class Population:
         x.to_png()
         return x
 
-    def tournament(self):
+    def tournament(self, tournament_size, intersections):
         picked_parents = []
 
-        for i in range(0, TOURNAMENT_SIZE):
+        for i in range(0, tournament_size):
             random = randint(0, len(self.population) - 1)
             while random in picked_parents:
                 random = randint(0, len(self.population) - 1)
@@ -41,7 +41,7 @@ class Population:
             picked_parents.append(random)
 
         potential_winners = list(map(lambda _x: self.population[_x], picked_parents))
-        return min(potential_winners)
+        return min(potential_winners, key=lambda _x: _x.get_fitness(intersections))
 
     def roulette(self):
         weights = []
@@ -69,5 +69,11 @@ class Population:
     def __len__(self):
         return len(self.population)
 
-    def get_best(self):
-        return min(self.population)
+    def get_best(self, intersections):
+        return min(self.population, key=lambda _x: _x.get_fitness(intersections))
+
+    def get_worst(self, intersections):
+        return max(self.population, key=lambda _x: _x.get_fitness(intersections))
+
+    def get_avg(self, intersections):
+        return np.mean([_x.get_fitness(intersections) for _x in self.population])

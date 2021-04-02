@@ -2,15 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0782b105-06a8-4aab-aae7-94c07739a5b4" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/../../CSPProblem/.idea/CSPProblem.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../CSPProblem/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../CSPProblem/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../../CSPProblem/.idea/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../CSPProblem/.idea/kotlinc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../CSPProblem/.idea/libraries/KotlinJavaRuntime.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../CSPProblem/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../CSPProblem/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../CSPProblem/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../CSPProblem/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../CSPProblem/CSPProblem.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../CSPProblem/src/Main.kt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Consts.py" beforeDir="false" afterPath="$PROJECT_DIR$/Consts.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Path.py" beforeDir="false" afterPath="$PROJECT_DIR$/Path.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Population.py" beforeDir="false" afterPath="$PROJECT_DIR$/Population.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Problem.py" beforeDir="false" afterPath="$PROJECT_DIR$/Problem.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Solution.py" beforeDir="false" afterPath="$PROJECT_DIR$/Solution.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Tools.py" beforeDir="false" afterPath="$PROJECT_DIR$/Tools.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/output.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/output.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/solution_to_print.json" beforeDir="false" afterPath="$PROJECT_DIR$/assets/solution_to_print.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -117,10 +118,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1471" height="466" key="DebuggerActiveHint/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1616791667262" />
-    <state x="740" y="275" key="FileChooserDialogImpl" timestamp="1615918584090">
+    <state x="740" y="275" key="FileChooserDialogImpl" timestamp="1617036575547">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="740" y="275" key="FileChooserDialogImpl/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1615918584090" />
+    <state x="740" y="275" key="FileChooserDialogImpl/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1617036575547" />
     <state width="1899" height="389" key="GridCell.Tab.0.bottom" timestamp="1616928495070">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>

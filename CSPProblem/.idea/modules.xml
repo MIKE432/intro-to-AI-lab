@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/CSPProblem.iml" filepath="$PROJECT_DIR$/CSPProblem.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/CSPProblem.iml" filepath="$PROJECT_DIR$/.idea/CSPProblem.iml" />
     </modules>
   </component>
 </project>

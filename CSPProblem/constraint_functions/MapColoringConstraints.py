@@ -1,9 +1,5 @@
-from typing import List
+from MapColoring import MapColoringNode
 
 
-def node_constraint_map_coloring(nodes: List):
-    for node in nodes:
-        for neighbour in node.neighbours:
-            if neighbour.value == node.value and neighbour.is_value_changed():
-                return False
-    return True
+def node_constraint_map_coloring(node: MapColoringNode, neighbour: MapColoringNode):
+    return neighbour.value != node.value or not neighbour.is_value_changed()

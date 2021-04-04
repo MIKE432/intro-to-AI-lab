@@ -1,6 +1,6 @@
 from typing import List
-
 from abstracts.Variable import Variable
+from abstracts.default_functions import no_constraint
 
 
 class Problem:
@@ -8,39 +8,34 @@ class Problem:
     def __init__(self, domain):
         self.nodes = []
         self.domain = domain
-        self.constraints = []
-        self.nodes_constraints = {}
+        self.constraint = no_constraint
 
     def apply_nodes(self, nodes: List):
         self.nodes = nodes
 
     def add_constraint(self, constraint):
-        self.constraints.append(constraint)
+        self.constraint = constraint
 
-    def add_node_specific_constraint(self, nodeNum, constraint):
-        if nodeNum > len(self.nodes):
-            raise IndexError(f"there is no such node with index: {nodeNum}, number of nodes: {len(self.nodes)}")
+    def number_of_conflicts(self):
+        counter = [0 for _ in self.nodes]
 
-        if nodeNum not in self.nodes_constraints:
-            self.nodes_constraints[nodeNum] = [constraint]
-        else:
-            self.nodes_constraints[nodeNum].append(constraint)
+        for i in range(0, len(self.nodes)):
+            counter[i] += self.__get_number_of_inconsistency(i)
 
-    def are_constraints_satisfied(self):
-        for constraint in self.constraints:
-            if not constraint(self.nodes):
-                return False
+        return counter
 
-        for key in self.nodes_constraints.keys():
-            node = self.nodes[key]
-            constraints = self.nodes_constraints[key]
-            for constraint in constraints:
-                if not constraint(node):
-                    return False
-        return True
+    def __get_number_of_inconsistency(self, i):
+        counter = 0
+        for neighbour in self.nodes[i].neighbours:
+            counter += 0 if self.constraint(self.nodes[i], neighbour) else 1
+
+        return counter
 
     def next(self):
         pass
 
     def add_node(self, node: Variable):
         self.nodes.append(node)
+
+    def evaluate_domain(self):
+        pass

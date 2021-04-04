@@ -1,4 +1,5 @@
 from BackTracking import BackTracking
+from Consts import FORWARD_CHECKING
 from EinsteinRiddle import EinsteinRiddle, init_einstein_problem
 from MapColoring import generate_map_coloring_problem
 from Tools import create_map
@@ -11,6 +12,7 @@ if __name__ == "__main__":
     # apply_einstein_constraints(problem)
     problem.add_constraint(node_constraint_map_coloring)
     resolver = BackTracking(problem)
-    resolver.resolve_problem()
-
+    resolver.resolve_problem(FORWARD_CHECKING)
+    # for node in problem.nodes:
+    #     print(node.value)
     create_map(problem)

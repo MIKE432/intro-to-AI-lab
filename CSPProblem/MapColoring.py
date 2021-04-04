@@ -44,7 +44,9 @@ def get_best_node(problem, node):
         if other_node != node and other_node not in node.neighbours:
             connection = [node, other_node]
             if not is_connection_not_valid(connection, problem):
-                distance = node.get_length_to(other_node)
+                a = other_node.x - node.x
+                b = other_node.y - node.y
+                distance = math.sqrt(a * a + b * b)
                 if distance < min_distance:
                     min_distance = distance
                     best_node = other_node
@@ -69,37 +71,11 @@ class MapColoringNode(Variable):
         self.x = x
         self.y = y
 
-    def pick_random_value(self, predefined=None):
-        if predefined is not None:
-            self.value = predefined
-            return
-        self.value = randint(0, len(self.domain))
-
     def add_neighbour(self, node):
         if node in self.neighbours:
             return
         self.neighbours.append(node)
         node.neighbours.append(self)
-
-    def get_all_lines(self):
-        lines = []
-        start = self.x, self.y
-
-        for neighbour in self.neighbours:
-            end = neighbour.x, neighbour.y
-
-            lines.append((start, end))
-
-        return lines
-
-    def get_length_to(self, node):
-        a = self.x - node.x
-        b = self.y - node.y
-
-        return math.sqrt(a * a + b * b)
-
-    def get_coordinates(self):
-        return self.x, self.y
 
 
 class MapColoring(Problem):
@@ -126,7 +102,7 @@ class MapColoring(Problem):
         return None
 
     def get_positions(self):
-        return list(map(lambda _x: _x.get_coordinates(), self.nodes))
+        return list(map(lambda _x: (_x.x, _x.y), self.nodes))
 
     def get_connections_indexes(self):
         _indexes = []

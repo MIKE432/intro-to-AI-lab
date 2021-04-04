@@ -23,3 +23,13 @@ def create_map(problem):
     json_data = create_json(problem)
     with open('Generator/json_map.json', 'w') as file:
         json.dump(json_data, file)
+
+
+def remove_from_domain(node, value, removed):
+    node.domain.remove(value)
+    removed.append((node, value))
+
+
+def restore_nodes(removed):
+    for node, value in removed:
+        node.add_to_domain(value)

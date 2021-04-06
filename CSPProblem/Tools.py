@@ -1,5 +1,6 @@
 import json
 import math
+from copy import deepcopy
 
 
 def ccw(A, B, C):
@@ -33,3 +34,32 @@ def remove_from_domain(node, value, removed):
 def restore_nodes(removed):
     for node, value in removed:
         node.add_to_domain(value)
+
+
+def init_queue_of_arcs(problem, queue):
+    for Xi in problem.nodes:
+        for Xk in Xi.neighbours:
+            queue.append((Xi, Xk))
+
+
+def revise(problem, Xi, Xj, removed):
+    revised = False
+    val_x = Xi.value
+    val_y = Xj.value
+    for x in deepcopy(Xi.domain):
+        Xi.value = x
+        counter = 0
+        for y in Xj.domain:
+            Xj.value = y
+            if problem.constraint(Xi, Xj):
+                counter += 1
+            Xj.to_empty()
+
+        if counter == 0:
+            remove_from_domain(Xi, x, removed)
+            revised = True
+        Xi.to_empty()
+
+    Xi.value = val_x
+    Xj.value = val_y
+    return revised

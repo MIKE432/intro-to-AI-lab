@@ -35,3 +35,6 @@ class Variable:
     def add_to_domain(self, item):
         self.domain.append(item)
         self._domain = sorted(self._domain)
+
+    def __str__(self):
+        return str(self.value) + " " + str(self.domain)

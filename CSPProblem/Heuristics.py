@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import List
 
 from Tools import remove_from_domain, init_queue_of_arcs, revise
@@ -9,7 +10,7 @@ def forward_checking(problem: Problem, current: Variable, removed):
     counter = 0
     for neighbour in current.neighbours:
         if not neighbour.is_value_changed():
-            for value in neighbour.domain:
+            for value in deepcopy(neighbour.domain):
                 neighbour.value = value
                 if not problem.constraint(current, neighbour):
                     remove_from_domain(neighbour, value, removed)
@@ -48,10 +49,9 @@ def mac(problem: Problem, current: Variable, removed):
 
 
 # to pick next empty
-def mcv(problem: Problem):
-    conflicts = problem.number_of_conflicts()
+def mrv(problem: Problem):
     sorted_nodes = sorted(filter(lambda _x: not _x.is_value_changed(), problem.nodes),
-                          key=lambda _x: conflicts[problem.nodes.index(_x)])
+                          key=lambda _x: len(_x.domain))
 
     if len(sorted_nodes) == 0:
         return None

@@ -1,5 +1,5 @@
 from Consts import FORWARD_CHECKING
-from Heuristics import forward_checking, mcv, lcv, mac
+from Heuristics import forward_checking, mrv, lcv, mac
 from Tools import restore_nodes
 from abstracts.Problem import Problem
 from abstracts.Resolver import Resolver
@@ -14,9 +14,9 @@ class BackTracking(Resolver):
 
     def resolve_problem(self, type):
         if type == FORWARD_CHECKING:
-            return self.backtrack(mcv, mac, lcv)
+            return self.backtrack(mrv, forward_checking, lcv)
         else:
-            return self.backtrack(mcv, mac, lcv)
+            return self.backtrack(mrv, forward_checking, lcv)
 
     def accept(self):
         return sum(self.problem.number_of_conflicts()) == 0

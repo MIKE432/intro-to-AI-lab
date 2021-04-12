@@ -39,3 +39,6 @@ class Problem:
 
     def evaluate_domain(self):
         pass
+
+    def __str__(self):
+        return str(list(map(lambda _x: str(_x), self.nodes)))

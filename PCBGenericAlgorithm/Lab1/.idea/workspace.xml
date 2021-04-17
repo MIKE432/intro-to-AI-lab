@@ -2,15 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0782b105-06a8-4aab-aae7-94c07739a5b4" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../../CSPProblem/.idea/CSPProblem.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../CSPProblem/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../CSPProblem/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../../CSPProblem/.idea/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../CSPProblem/.idea/kotlinc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../CSPProblem/.idea/libraries/KotlinJavaRuntime.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../CSPProblem/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../CSPProblem/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../CSPProblem/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../CSPProblem/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../CSPProblem/CSPProblem.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../CSPProblem/src/Main.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../CSPProblem/BackTracking.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../CSPProblem/BackTracking.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../CSPProblem/Generator/json_map.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../CSPProblem/Generator/json_map.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../CSPProblem/Generator/map.png" beforeDir="false" afterPath="$PROJECT_DIR$/../../CSPProblem/Generator/map.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../CSPProblem/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../CSPProblem/Main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../CSPProblem/Tools.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../CSPProblem/Tools.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../CSPProblem/abstracts/Problem.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../CSPProblem/abstracts/Problem.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../CSPProblem/abstracts/Variable.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../CSPProblem/abstracts/Variable.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../CSPProblem/abstracts/default_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../CSPProblem/abstracts/default_functions.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

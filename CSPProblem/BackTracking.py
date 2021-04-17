@@ -12,16 +12,16 @@ class BackTracking(Resolver):
         self.solutions = []
         self.n = 0
 
-    def resolve_problem(self, type):
-        if type == FORWARD_CHECKING:
-            return self.backtrack(mrv, forward_checking, lcv)
-        else:
-            return self.backtrack(mrv, forward_checking, lcv)
+    def resolve_problem(self, picking_next_heuristics=overridden_next, evaluate=no_checking, sort_values=no_sort):
+        return self.__backtrack(picking_next_heuristics, evaluate, sort_values)
 
     def accept(self):
         return sum(self.problem.number_of_conflicts()) == 0
 
-    def backtrack(self, picking_next_heuristics=overridden_next, evaluate=no_checking, sort_values=no_sort):
+    def reset(self):
+        self.n = 0
+
+    def __backtrack(self, picking_next_heuristics, evaluate, sort_values):
         next_empty = picking_next_heuristics(self.problem)
         if next_empty is None:
             return True
@@ -32,7 +32,7 @@ class BackTracking(Resolver):
             removed = []
             if self.accept():
                 if evaluate(self.problem, next_empty, removed):
-                    if self.backtrack(picking_next_heuristics, evaluate, sort_values):
+                    if self.__backtrack(picking_next_heuristics, evaluate, sort_values):
                         return True
             restore_nodes(removed)
             next_empty.to_empty()

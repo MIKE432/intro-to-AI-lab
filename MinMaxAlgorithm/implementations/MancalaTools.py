@@ -10,10 +10,10 @@ def get_opposite_index(index):
         return index - indexes2.index(index) * 2
 
 
-def turn(board, current_player):
+def turn(board, current_player, is_first_turn=False):
     another_turn = True
     while another_turn and not end_condition_mancala(board):
-        player_choice = current_player.move(get_player_choices(board, current_player.tag), board)
+        player_choice = current_player.move(get_player_choices(board, current_player.tag), board, is_first_turn)
         another_turn = move_chosen_pieces(board, current_player.tag, player_choice)
 
 
@@ -96,8 +96,24 @@ def get_player_choices(board, current_player_tag):
 def evaluate_function(board):
     player1 = board[6]
     player2 = board[13]
-
+    combine_heuristics(board, player1, player2)
     return {
         PLAYER_ONE: player1,
         PLAYER_TWO: player2
     }
+
+# heuristics
+def bonus_endgame(board, p1, p2):
+    exp = 0.8 if not end_condition_mancala(board) else 2
+    p1 += sum(board[:6]) * exp
+    p2 += sum(board[7:13]) * exp
+
+
+def bonus_beating_enemy(p1, p2):
+    p1 -= p2
+    p2 -= p1
+
+
+def combine_heuristics(board, player1, player2):
+    bonus_endgame(board, player1, player2)
+    bonus_beating_enemy(player1, player2)

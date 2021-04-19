@@ -41,3 +41,13 @@ class Mancala(Game):
         player2 = sum(self.board[7:])
 
         return player1, player2
+
+
+def AIvsAI(game):
+    first_turn = True
+    while not game.end_condition():
+        turn(game.board, game.current_player, first_turn)
+        first_turn = False
+        game.switch_players()
+        print(game)
+    print(game.sum_points())

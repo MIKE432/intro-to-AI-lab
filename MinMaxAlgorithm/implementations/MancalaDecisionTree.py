@@ -13,7 +13,7 @@ def apply_decision_tree_to_root(curr_board, current_node, depth):
         node = MancalaDecisionNode(new_board, current_node.player_tag if another_turn else get_other_player(
             current_node.player_tag), choice)
         current_node.add_child(node)
-        apply_decision_tree_to_root(new_board, node, depth - 1)
+        apply_decision_tree_to_root(new_board, node, depth - 1 if not another_turn else depth)
 
 
 class MancalaDecisionNode:

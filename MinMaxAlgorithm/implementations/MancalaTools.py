@@ -10,15 +10,17 @@ def get_opposite_index(index):
         return index - indexes2.index(index) * 2
 
 
-def turn(board, current_player, is_first_turn=False):
+def turn(board, current_player, root, is_first_turn=False, update_board=None):
     another_turn = True
     while another_turn and not end_condition_mancala(board):
-        player_choice = current_player.move(get_player_choices(board, current_player.tag), board, is_first_turn)
+        player_choice = current_player.move(get_player_choices(board, current_player.tag), board, root(), is_first_turn)
         another_turn = move_chosen_pieces(board, current_player.tag, player_choice)
+        if update_board:
+            update_board(player_choice)
 
 
 def end_condition_mancala(board):
-    return sum(board[0:6]) == 0 or sum(board[7:13]) == 0
+    return sum(board[0:6]) == 0 or sum(board[7:13]) == 0 or board[6] > 24 or board[13] > 24
 
 
 def get_end_condition_by_player(board, player_tag):
@@ -65,6 +67,7 @@ def move_chosen_pieces(board, current_player_tag, choice):
         6, 13, list(range(7, 13)))
     incremented = 0
     another_turn = False
+    after_beating = False
     for i in range(1, count + 1):
         current = (choice + i + incremented) % 14
         if current != invalid:
@@ -74,6 +77,7 @@ def move_chosen_pieces(board, current_player_tag, choice):
                 if board[opposite] != 0:
                     move_from_to(board, current_player_tag, opposite, base, board[opposite], True)
                     move_from_to(board, current_player_tag, choice, base)
+                    after_beating = True
                 else:
                     move_from_to(board, current_player_tag, choice, current)
             else:
@@ -85,7 +89,7 @@ def move_chosen_pieces(board, current_player_tag, choice):
             move_from_to(board, current_player_tag, choice, (current + 1) % 14)
             incremented += 1
 
-    return another_turn
+    return another_turn and not after_beating
 
 
 def get_player_choices(board, current_player_tag):
@@ -101,6 +105,7 @@ def evaluate_function(board):
         PLAYER_ONE: player1,
         PLAYER_TWO: player2
     }
+
 
 # heuristics
 def bonus_endgame(board, p1, p2):

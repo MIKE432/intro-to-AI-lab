@@ -1,9 +1,12 @@
+from copy import deepcopy
 from random import randint
 
+from Tools import get_other_player
 from abstracts.Player import Player
-from implementations.MancalaDecisionTree import MancalaDecisionNode, apply_decision_tree_to_root
-from implementations.MancalaTools import end_condition_mancala, evaluate_function
-from implementations.MinmaxTools import min_max
+from implementations.MancalaDecisionTree import MancalaDecisionNode, apply_decision_tree_to_root, \
+    prepare_tree_for_min_max
+from implementations.MancalaTools import end_condition_mancala, evaluate_function, move_chosen_pieces
+from implementations.MinmaxTools import min_max, min_max2
 
 
 class BotPlayer(Player):
@@ -11,12 +14,21 @@ class BotPlayer(Player):
         super().__init__(number)
         self.difficulty = difficulty
 
-    def move(self, choices, board, random_move=False):
+    def move(self, choices, board, root, random_move=False):
         if random_move:
             return choices[randint(0, len(choices) - 1)]
-        root = MancalaDecisionNode(board, self.tag, -1)
-        apply_decision_tree_to_root(board, root, self.difficulty + 1)
-        min_max(root, self.difficulty, self.tag, end_condition_mancala, evaluate_function, -100000000, 100000000)
-        choice = list(sorted(root.children, key=lambda _x: (-1) * _x.value))[0].after_picking
-        print(f"Bot {self.tag} picked {choice}")
-        return choice
+
+        max = -1000
+        _choice = 0
+        for choice in choices:
+            b = deepcopy(board)
+            another_turn = move_chosen_pieces(b, self.tag, choice)
+            value = min_max2(b, get_other_player(
+                self.tag) if not another_turn else self.tag - 1, self.difficulty, self.tag, end_condition_mancala,
+                             evaluate_function, -100000000, 100000000)
+
+            if value > max:
+                max = value
+                _choice = choice
+        print(f"Bot {self.tag} picked {_choice}")
+        return _choice

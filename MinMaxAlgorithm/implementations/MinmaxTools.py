@@ -38,8 +38,8 @@ def min_max(node, depth, maximizing_player, end_condition, evaluate, alpha, beta
         return min_eval
 
 
-def min_max2(board, player_tag, depth, maximizing_player, end_condition, evaluate, alpha, beta):
-    if depth == 0 or end_condition(board):
+def min_max2(board, player_tag, depth, maximizing_player, end_condition, evaluate, alpha, beta, use_alpha_beta=True):
+    if depth <= 0 or end_condition(board):
         return evaluate(board)[maximizing_player]
 
     if maximizing_player == player_tag:
@@ -51,11 +51,11 @@ def min_max2(board, player_tag, depth, maximizing_player, end_condition, evaluat
             eval = min_max2(new_board, get_other_player(
                 player_tag) if not another_turn else player_tag, depth - 1 if not another_turn else depth,
                            maximizing_player,
-                           end_condition, evaluate, alpha, beta)
+                           end_condition, evaluate, alpha, beta, use_alpha_beta)
             max_eval = max(max_eval, eval)
 
             alpha = max(alpha, eval)
-            if beta <= alpha:
+            if beta <= alpha and use_alpha_beta:
                 break
         return max_eval
     else:
@@ -67,10 +67,10 @@ def min_max2(board, player_tag, depth, maximizing_player, end_condition, evaluat
             eval = min_max2(new_board, get_other_player(
                 player_tag) if not another_turn else player_tag, depth - 1 if not another_turn else depth,
                             maximizing_player,
-                            end_condition, evaluate, alpha, beta)
+                            end_condition, evaluate, alpha, beta, use_alpha_beta)
             min_eval = min(min_eval, eval)
             beta = min(beta, eval)
-            if beta <= alpha:
+            if beta <= alpha and use_alpha_beta:
                 break
         return min_eval
 

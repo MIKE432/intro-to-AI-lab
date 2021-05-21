@@ -13,11 +13,12 @@ class Game:
     def end_condition(self):
         return True
 
-    def run(self):
+    def run(self, disable_print=False):
         while not self.end_condition():
             self.turn_procedure()
             self.switch_players()
-            print(self)
+            if not disable_print:
+                print(self)
         print(self.sum_points())
 
     def switch_players(self):

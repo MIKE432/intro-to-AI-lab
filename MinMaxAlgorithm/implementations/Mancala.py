@@ -11,7 +11,6 @@ class Mancala(Game):
         super().__init__(player1, player2)
         self.board = []
         self.__init_board()
-        self.decision_tree = self.__init_decision_tree()
 
     def pick_first_player(self):
         self.current_player = self.players[0]
@@ -23,16 +22,6 @@ class Mancala(Game):
             else:
                 self.board.append(4)
 
-    def __init_decision_tree(self):
-        depth = 0
-        if isinstance(self.players[0], BotPlayer) and isinstance(self.players[1], BotPlayer):
-            depth = max(self.players[0].difficulty, self.players[1].difficulty)
-
-        node = MancalaDecisionNode(self.board, self.current_player.tag, -1)
-        if depth > 0:
-            apply_decision_tree_to_root(self.board, node, depth + 1)
-            return node
-
     def get_player_choices(self):
         start, end = (0, 6) if self.current_player == self.players[0] else (7, 13)
         return list(filter(lambda _x: self.board[_x] != 0, list(range(start, end))))
@@ -40,20 +29,8 @@ class Mancala(Game):
     def end_condition(self):
         return end_condition_mancala(self.board)
 
-    def update_after_turn(self, choice):
-        if self.decision_tree:
-            for child in self.decision_tree.children:
-                if child.after_picking == choice:
-                    self.decision_tree = child
-
-        if self.decision_tree:
-            add_one_level(self.decision_tree)
-
-    def root(self):
-        return self.decision_tree
-
     def turn_procedure(self):
-        turn(self.board, self.current_player, self.root, False, self.update_after_turn)
+        turn(self.board, self.current_player, True)
 
     def __str__(self):
         s = "      " + str(list(reversed(self.board[7:13]))) + "\n" + str(
@@ -68,11 +45,12 @@ class Mancala(Game):
         return player1, player2
 
 
-def AIvsAI(game):
+def AIvsAI(game, disable_print=False):
     first_turn = True
     while not game.end_condition():
-        turn(game.board, game.current_player, game.decision_tree,  first_turn, game.update_after_turn)
+        turn(game.board, game.current_player,  first_turn)
         first_turn = False
         game.switch_players()
-        print(game)
+        if not disable_print:
+            print(game)
     print(game.sum_points())

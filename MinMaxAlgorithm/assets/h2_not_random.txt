@@ -1,0 +1,5 @@
+
+LVL 2: min-max(21), alpha-beta(21)
+LVL 3: min-max(26), alpha-beta(26)
+LVL 4: min-max(30), alpha-beta(30)
+LVL 5: min-max(22), alpha-beta(22)

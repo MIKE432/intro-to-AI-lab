@@ -1,24 +1,22 @@
 import random
 
 from sklearn import svm
-from sklearn.feature_extraction.text import TfidfVectorizer, TfidfTransformer, CountVectorizer
-from sklearn.linear_model import SGDClassifier
-from sklearn.model_selection import GridSearchCV
+from sklearn.feature_extraction.text import TfidfTransformer, CountVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 import numpy as np
 
 
-def get_sets():
+def get_sets(class_num=3):
     texts1 = open("scaledata/Dennis+Schwartz/subj.Dennis+Schwartz", "r")
     texts2 = open("scaledata/James+Berardinelli/subj.James+Berardinelli", "r")
     texts3 = open("scaledata/Scott+Renshaw/subj.Scott+Renshaw", "r")
     texts4 = open("scaledata/Steve+Rhodes/subj.Steve+Rhodes", "r")
 
-    raw_labels1 = open("scaledata/Dennis+Schwartz/label.3class.Dennis+Schwartz", "r")
-    raw_labels2 = open("scaledata/James+Berardinelli/label.3class.James+Berardinelli", "r")
-    raw_labels3 = open("scaledata/Scott+Renshaw/label.3class.Scott+Renshaw", "r")
-    raw_labels4 = open("scaledata/Steve+Rhodes/label.3class.Steve+Rhodes", "r")
+    raw_labels1 = open(f"scaledata/Dennis+Schwartz/label.{class_num}class.Dennis+Schwartz", "r")
+    raw_labels2 = open(f"scaledata/James+Berardinelli/label.{class_num}class.James+Berardinelli", "r")
+    raw_labels3 = open(f"scaledata/Scott+Renshaw/label.{class_num}class.Scott+Renshaw", "r")
+    raw_labels4 = open(f"scaledata/Steve+Rhodes/label.{class_num}class.Steve+Rhodes", "r")
 
     lines = texts1.readlines()
     lines.extend(texts2.readlines())
@@ -37,19 +35,20 @@ def predict_svm(X_train, Y_train, X_test, Y_test, **kwargs):
     text_clf = Pipeline([
         ('vect', CountVectorizer(stop_words='english')),
         ('tfidf', TfidfTransformer()),
-        ('clf', svm.SVC(kernel='linear')),
+        ('clf', svm.SVC()),
     ])
+
     text_clf.set_params(**kwargs)
     text_clf.fit(X_train, Y_train)
     predicted = text_clf.predict(X_test)
     return np.mean(predicted == Y_test)
 
 
-def predict_bayes(X_train, Y_train, X_test, Y_test, alpha=1.0, fit_prior=True):
+def predict_bayes(X_train, Y_train, X_test, Y_test, **kwargs):
     text_clf = Pipeline([
         ('vect', CountVectorizer(stop_words='english')),
         ('tfidf', TfidfTransformer()),
-        ('clf', MultinomialNB(alpha=alpha, fit_prior=fit_prior)),
+        ('clf', MultinomialNB(alpha=kwargs['alpha'], fit_prior=kwargs['fit_prior'])),
     ])
 
     text_clf.fit(X_train, Y_train)
@@ -95,7 +94,8 @@ def tuning_hyper_parameters_nb(X, Y, alphas, fit_priors, nfolds):
             vals = []
             for i in range(0, nfolds):
                 X_train, Y_train, X_text, Y_test = pick_train_and_test_sets(X, Y, i, nfolds)
-                vals.append(predict_bayes(X_train, Y_train, X_text, Y_test, alpha, fit_prior))
+                params = {'alpha': alpha, 'fit_prior': fit_prior}
+                vals.append(predict_bayes(X_train, Y_train, X_text, Y_test, **params))
 
             val = np.mean(vals)
             if val > best:
@@ -137,3 +137,12 @@ def split_sets_to_smaller_pieces(X, Y, k):
         parts.append(zipped[part * (i - 1):i * part])
 
     return list(map(lambda _x: list(zip(*_x)), parts))
+
+
+def test_cross(X, Y, f, nfolds, **kwargs):
+    vals = []
+    for i in range(0, nfolds):
+        X_train, Y_train, X_text, Y_test = pick_train_and_test_sets(X, Y, i, nfolds)
+        vals.append(f(X_train, Y_train, X_text, Y_test, **kwargs))
+
+    return np.mean(vals)

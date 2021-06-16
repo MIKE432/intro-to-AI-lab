@@ -33,10 +33,14 @@ def get_sets(class_num=3):
 
 def predict_svm(X_train, Y_train, X_test, Y_test, **kwargs):
     text_clf = Pipeline([
-        ('vect', CountVectorizer(stop_words='english')),
+        ('vect', CountVectorizer(stop_words='english',
+                                 max_features=kwargs['max_features'] if 'max_features' in kwargs else None)),
         ('tfidf', TfidfTransformer()),
-        ('clf', svm.SVC()),
+        ('clf', svm.SVC(kernel='linear')),
     ])
+
+    if 'max_features' in kwargs:
+        del kwargs['max_features']
 
     text_clf.set_params(**kwargs)
     text_clf.fit(X_train, Y_train)
@@ -46,19 +50,22 @@ def predict_svm(X_train, Y_train, X_test, Y_test, **kwargs):
 
 def predict_bayes(X_train, Y_train, X_test, Y_test, **kwargs):
     text_clf = Pipeline([
-        ('vect', CountVectorizer(stop_words='english')),
+        ('vect', CountVectorizer(stop_words='english', max_features=kwargs['max_features'] if 'max_features' in kwargs else None)),
         ('tfidf', TfidfTransformer()),
         ('clf', MultinomialNB(alpha=kwargs['alpha'], fit_prior=kwargs['fit_prior'])),
     ])
+    if 'max_features' in kwargs:
+        del kwargs['max_features']
 
     text_clf.fit(X_train, Y_train)
     predicted = text_clf.predict(X_test)
     return np.mean(predicted == Y_test)
 
 
-def get_training_and_test_set(lines, labels, percentage=0.9):
+def get_training_and_test_set(lines, labels, percentage=0.9, max_data=5000):
     zipped = list(zip(lines, labels))
     random.shuffle(zipped)
+    zipped = zipped[:max_data]
     x = len(zipped)
     a = int(x * percentage)
     train_set_zipped = zipped[:a]
@@ -67,8 +74,8 @@ def get_training_and_test_set(lines, labels, percentage=0.9):
     return list(zip(*train_set_zipped)), list(zip(*test_set_zipped))
 
 
-def pick_train_and_test_sets(X, Y, k, nfolds):
-    sets = split_sets_to_smaller_pieces(X, Y, nfolds)
+def pick_train_and_test_sets(X, Y, k, nfolds, max_data):
+    sets = split_sets_to_smaller_pieces(X, Y, nfolds, max_data)
     X_train = []
     Y_train = []
     X_test = []
@@ -88,37 +95,41 @@ def pick_train_and_test_sets(X, Y, k, nfolds):
 def tuning_hyper_parameters_nb(X, Y, alphas, fit_priors, nfolds):
     best_params = alphas[0], fit_priors[0]
     best = np.inf * -1
+    print("NB")
 
     for alpha in alphas:
         for fit_prior in fit_priors:
             vals = []
             for i in range(0, nfolds):
-                X_train, Y_train, X_text, Y_test = pick_train_and_test_sets(X, Y, i, nfolds)
+                X_train, Y_train, X_text, Y_test = pick_train_and_test_sets(X, Y, i, nfolds, 5000)
                 params = {'alpha': alpha, 'fit_prior': fit_prior}
                 vals.append(predict_bayes(X_train, Y_train, X_text, Y_test, **params))
 
             val = np.mean(vals)
+            print(alpha, fit_prior, val)
             if val > best:
                 best = val
                 print(best)
-                best_params = alpha, fit_prior
+                best_params = {'alpha': alpha, 'fit_prior': fit_prior}
 
     return best_params
+
+
 
 
 def tuning_hyper_parameters_svm(X, Y, cs, gammas, nfolds):
     best_params = {}
     best = np.inf * -1
-
+    print("SVM")
     for c in cs:
         for gamma in gammas:
             vals = []
             params = {'clf__C': c, 'clf__gamma': gamma}
             for i in range(0, nfolds):
-                X_train, Y_train, X_text, Y_test = pick_train_and_test_sets(X, Y, i, nfolds)
+                X_train, Y_train, X_text, Y_test = pick_train_and_test_sets(X, Y, i, nfolds, 5000)
                 vals.append(predict_svm(X_train, Y_train, X_text, Y_test, **params))
-
             val = np.mean(vals)
+            print(c, gamma, val)
             if val > best:
                 best = val
                 best_params = params
@@ -126,10 +137,10 @@ def tuning_hyper_parameters_svm(X, Y, cs, gammas, nfolds):
     return best_params
 
 
-def split_sets_to_smaller_pieces(X, Y, k):
+def split_sets_to_smaller_pieces(X, Y, k, max_data):
     zipped = list(zip(X, Y))
     random.shuffle(zipped)
-
+    zipped = zipped[:max_data]
     length = len(zipped)
     part = int(length / k)
     parts = []
@@ -139,10 +150,10 @@ def split_sets_to_smaller_pieces(X, Y, k):
     return list(map(lambda _x: list(zip(*_x)), parts))
 
 
-def test_cross(X, Y, f, nfolds, **kwargs):
+def test_cross(X, Y, f, nfolds, max_data, **kwargs):
     vals = []
     for i in range(0, nfolds):
-        X_train, Y_train, X_text, Y_test = pick_train_and_test_sets(X, Y, i, nfolds)
+        X_train, Y_train, X_text, Y_test = pick_train_and_test_sets(X, Y, i, nfolds, max_data)
         vals.append(f(X_train, Y_train, X_text, Y_test, **kwargs))
 
     return np.mean(vals)
